@@ -1,6 +1,9 @@
 package conta.controller;
 
+import java.net.http.HttpResponse.BodySubscriber;
 import java.util.ArrayList;
+
+import javax.management.ValueExp;
 
 import conta.model.Conta;
 import conta.repositorio.ContaRepositorio;
@@ -64,20 +67,41 @@ public class ContaController implements ContaRepositorio {
 
 	@Override
 	public void sacar(int numero, float valor) {
-		// TODO Auto-generated method stub
+		var conta = buscarNaCollection(numero);
 
+		if (conta != null) {
+			if (conta.sacar(valor) == true)
+				System.out.println("\nO saque na Conta número: " + numero + " foi efetuaod com sucesso!");
+		} else {
+			System.out.println("\nA Conta número: " + numero + " não foi encontrada!");
+		}
 	}
 
 	@Override
 	public void depositar(int numero, float valor) {
-		// TODO Auto-generated method stub
+		var conta = buscarNaCollection(numero);
+
+		if (conta != null) {
+			conta.depositar(valor);
+			System.out.println("\nOdepósito na conta número: " + numero + " foi efetuado com sucesso!");
+		} else {
+			System.out.println(
+					"\nA conta número: " + numero + " não foi encontrada ou a conta destino não é uma Conta Corrente!");
+		}
 
 	}
 
 	@Override
-	public void transferir(int numeroOrigem, int numeroDestino, float valor) {
-		// TODO Auto-generated method stub
+	public void transferir(int numero, int numeroDestino, float valor) {
+		var contaOrigem = buscarNaCollection(numero);
+		var contaDestino = buscarNaCollection(numeroDestino);
 
+		if (contaOrigem.sacar(valor) == true) {
+			contaDestino.depositar(valor);
+			System.out.println("\nA transferência foi efetuada com sucesso!");
+		} else {
+			System.out.println("\nA oonta de origem e/ou destino não foram encontradas!");
+		}
 	}
 
 	public int gerarNumero() {
