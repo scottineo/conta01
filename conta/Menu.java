@@ -6,6 +6,7 @@ import conta.model.ContaPoupanca;
 import conta.util.Cores;
 
 import java.io.IOException;
+import java.io.ObjectInputStream.GetField;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -17,9 +18,9 @@ public class Menu {
 		int opcao, numero, agencia, tipo, aniversario;
 		String titular;
 		float saldo, limite;
-		
+
 		System.out.println("\nCriar Contas\n");
-		
+
 		ContaCorrente cc1 = new ContaCorrente(contas.gerarNumero(), 123, 1, "João da Silva", 1000f, 100.0f);
 		contas.cadastrar(cc1);
 		ContaCorrente cc2 = new ContaCorrente(contas.gerarNumero(), 124, 1, "Maria da Silva", 2000f, 100.0f);
@@ -105,16 +106,64 @@ public class Menu {
 			}
 			case 3 -> {
 				System.out.println(Cores.TEXT_WHITE + "Buscar contas por número");
+				System.out.println("Digite o número da conta: ");
+				numero = scanner.nextInt();
+
+				contas.procurarPorNumero(numero);
+
 				keyPress();
 				break;
 			}
 			case 4 -> {
 				System.out.println(Cores.TEXT_WHITE + "Atualizar dados da conta");
+
+				System.out.println("Digite o número da conta: ");
+				numero = scanner.nextInt();
+
+				var buscaConta = contas.buscarNaCollection(numero);
+
+				if (buscaConta != null) {
+					tipo = buscaConta.getTipo();
+
+					System.out.println("Digite o número da agência: ");
+					agencia = scanner.nextInt();
+					System.out.println("Digite o nome do Titular: ");
+					scanner.skip("\\R?");
+					titular = scanner.nextLine();
+
+					System.out.println("Digite o saldo da conta (R$): ");
+					saldo = scanner.nextFloat();
+
+					switch (tipo) {
+					case 1 -> {
+						System.out.println("Digite o limite de crédito (R$): ");
+						limite = scanner.nextFloat();
+
+						contas.atualizar(new ContaCorrente(numero, agencia, tipo, titular, saldo, limite));
+					}
+					case 2 -> {
+						System.out.println("Digite o dia do aniversário da conta: ");
+						aniversario = scanner.nextInt();
+
+						contas.atualizar(new ContaPoupanca(numero, agencia, tipo, titular, saldo, aniversario));
+					}
+					default -> {
+						System.out.println("Tipo de conta inválida.");
+					}
+					}
+				} else {
+					System.out.println("A conta não foi encontrada.");
+				}
+
 				keyPress();
 				break;
 			}
 			case 5 -> {
 				System.out.println(Cores.TEXT_WHITE + "Excluir conta");
+				System.out.println("Digite o número da conta: ");
+				numero = scanner.nextInt();
+				
+				contas.deletar(numero);
 				keyPress();
 				break;
 			}
